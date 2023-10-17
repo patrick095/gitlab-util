@@ -1,16 +1,20 @@
 'use client';
 import { useState } from 'react';
-import { ConfigService } from '../core/services/config.service';
+import { useRouter } from 'next/navigation';
+
+import { ConfigService } from '@core/services/config.service';
+import { Button } from '@core/components/button';
 
 export default function Config() {
     const [url, setUrl] = useState('');
     const [token, setToken] = useState('');
     const [saveStorage, setSaveStorage] = useState(false);
+    const router = useRouter();
 
     function saveConfig() {
         if (!url || !token) return alert('Favor preencher todos os dados!');
 
-        new ConfigService(window).setConfig({ baseUrl: url, token }, !saveStorage);
+        new ConfigService(window).setConfig({ baseUrl: url, token }, saveStorage);
 
         alert('Configuração salvar com sucesso. Agora ja pode acessar as funcionalidades corretamente.');
         setUrl('');
@@ -61,12 +65,10 @@ export default function Config() {
                 </div>
             </div>
             <div className="mt-5 d-flex justify-content-end col-6">
-                <button className="btn btn-secondary link-nav me-3" data-page="home" id="nav-back">
+                <Button enfase="secondary" className="me-2" onClick={() => router.push('/')}>
                     Voltar
-                </button>
-                <button className="btn btn-primary" id="save-config-gitlab" onClick={saveConfig}>
-                    Salvar Configuração
-                </button>
+                </Button>
+                <Button onClick={saveConfig}>Salvar Configuração</Button>
             </div>
         </>
     );

@@ -8,7 +8,7 @@ export class GitlabService extends BaseService {
     }
 
     public async getProjectsFromGroupId(id: number): Promise<Array<GitlabProjectInterface>> {
-        return await this.get<Array<GitlabProjectInterface>>('`groups/${id}/projects`');
+        return await this.get<Array<GitlabProjectInterface>>(`groups/${id}/projects`);
     }
 
     public async transferProjectToGroup(projectId: number, groupId: number): Promise<GitlabTransferResponseInterface> {
