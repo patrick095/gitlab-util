@@ -161,9 +161,12 @@ export default function MoverProjetosEntreGrupos() {
                         <ul className="list-group">
                             {listProjectsGroupFrom.length ? (
                                 listProjectsGroupFrom.map((project, index) => {
-                                    if (filterProject && !project.name.toLowerCase().includes(filterProject.toLowerCase())) return '';
                                     return (
-                                        <li className="list-group-item" key={'project-from-' + index}>
+                                        <li
+                                            className={`list-group-item ${
+                                                filterProject && !project.name.toLowerCase().includes(filterProject.toLowerCase()) ? 'hidden' : ''
+                                            }`}
+                                            key={'project-from-' + index}>
                                             <div className="form-check">
                                                 <input
                                                     className="form-check-input project-to-transfer"
