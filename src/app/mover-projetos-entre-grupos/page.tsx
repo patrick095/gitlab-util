@@ -164,7 +164,7 @@ export default function MoverProjetosEntreGrupos() {
                                     return (
                                         <li
                                             className={`list-group-item ${
-                                                filterProject && !project.name.toLowerCase().includes(filterProject.toLowerCase()) ? 'hidden' : ''
+                                                filterProject && !project.name.toLowerCase().includes(filterProject.toLowerCase()) ? 'd-none' : ''
                                             }`}
                                             key={'project-from-' + index}>
                                             <div className="form-check">
