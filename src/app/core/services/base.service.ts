@@ -18,10 +18,8 @@ export class BaseService {
             let page = +res.headers.get('x-page');
             for (let index = 0; page <= totalPages; page++) {
                 const res = (await this._sendRequest<T>(RequestMethodEnum.GET, `${path}?&per_page=${perPage}&page=${page}`, true)) as Array<any>;
-                console.log('single response', res);
                 allResponse = allResponse.concat(res);
             }
-            console.log('all response', allResponse);
             return allResponse as T;
         } else {
             return res;

@@ -55,10 +55,16 @@ export default function MoverProjetosEntreGrupos() {
             .getProjectsFromGroupId(groupFrom.id)
             .then((projects) => {
                 if (projects && Array.isArray(projects)) setListProjectsGroupFrom(projects);
-                console.log(projects.length, projects);
                 setOpenModal(true);
             })
             .finally(() => setLoading({ ...loading, initTransferProjects: false }));
+    }
+
+    function selectAll(checked: boolean) {
+        if (checked) {
+            return setListProjectsGroupToTransfer([...listProjectsGroupFrom]);
+        }
+        setListProjectsGroupToTransfer([]);
     }
 
     function selectProjectToTransfer(id: number, selected: boolean) {
@@ -70,20 +76,36 @@ export default function MoverProjetosEntreGrupos() {
             const index = newList.findIndex((project) => project.id === id);
             newList.splice(index, 1);
         }
-        setListProjectsGroupToTransfer(newList);
+        setListProjectsGroupToTransfer([...newList]);
+    }
+
+    function selectMultipleByList(list: string) {
+        const listItens = list.split('\n');
+        const newList = listProjectsToTransfer;
+        listItens.forEach((item) => {
+            const isSelected = listProjectsToTransfer.findIndex((project) => project.name.toLowerCase() === item.toLowerCase()) >= 0;
+            const project = listProjectsGroupFrom.find((project) => project.name.toLowerCase() === item.toLowerCase());
+
+            if (!isSelected && project) {
+                newList.push(project);
+            }
+        });
+        setListProjectsGroupToTransfer([...newList]);
     }
 
     async function confirmTransferProjects() {
         setLoading({ ...loading, confirmTransferProjects: true });
-        const isConfirmed = confirm(`Confirme os projetos Selecionados:\n${listProjectsToTransfer.map((p) => p.name).join('\n')}`);
+        const isConfirmed = confirm(
+            `Confirme os projetos Selecionados(${listProjectsToTransfer.length}):\n${listProjectsToTransfer.map((p) => p.name).join('\n')}`,
+        );
 
-        // if (isConfirmed) {
-        //     for (const project of listProjectsToTransfer) {
-        //         setProjectTransfering(project.name);
-        //         await gitlabService.transferProjectToGroup(project.id, groupTo.id);
-        //     }
-        //     setProjectTransfering('Todos os projetos foram transferidos.');
-        // }
+        if (isConfirmed) {
+            for (const project of listProjectsToTransfer) {
+                setProjectTransfering(project.name);
+                await gitlabService.transferProjectToGroup(project.id, groupTo.id);
+            }
+            setProjectTransfering('Todos os projetos foram transferidos.');
+        }
         setLoading({ ...loading, confirmTransferProjects: false });
     }
 
@@ -158,6 +180,24 @@ export default function MoverProjetosEntreGrupos() {
                                 <i className="fa-solid fa-magnifying-glass"></i>
                             </span>
                         </div>
+                        <div className="my-3 input-group">
+                            <textarea
+                                onChange={(e) => selectMultipleByList(e.target.value)}
+                                className="form-control"
+                                placeholder="Lista com nomes dos projetos a serem selecionados"
+                            />
+                        </div>
+                        <div className="form-check">
+                            <input
+                                className="form-check-input project-to-transfer"
+                                type="checkbox"
+                                id="select-all"
+                                onChange={(e) => selectAll(e.target.checked)}
+                            />
+                            <label className="form-check-label" htmlFor="select-all">
+                                Selecionar Todos
+                            </label>
+                        </div>
                         <ul className="list-group">
                             {listProjectsGroupFrom.length ? (
                                 listProjectsGroupFrom.map((project, index) => {
@@ -171,6 +211,7 @@ export default function MoverProjetosEntreGrupos() {
                                                 <input
                                                     className="form-check-input project-to-transfer"
                                                     type="checkbox"
+                                                    checked={listProjectsToTransfer.some((p) => p.id === project.id)}
                                                     onChange={(e) => selectProjectToTransfer(project.id, e.target.checked)}
                                                     id={project.id.toString()}
                                                 />
